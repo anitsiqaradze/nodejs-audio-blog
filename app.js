@@ -6,7 +6,7 @@ var logger = require('morgan');
 
 var rateLimit = require("express-rate-limit");
 
-
+var indexRouter = require('./routes/index')
 var authRouter = require('./routes/auth');
 var userRouter = require('./routes/user')
 var audioRouter = require('./routes/audio');
@@ -28,6 +28,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // routes
+app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/audio', audioRouter);
 app.use('/user', userRouter);
