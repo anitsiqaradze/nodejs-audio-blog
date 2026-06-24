@@ -1,22 +1,7 @@
+Audio Streaming & Social Interaction API
+A lightweight, high-performance Node.js REST API built with Express and MongoDB for managing audio track uploads, user authentication, social following graphs, and interactive comment feeds.
 
 
+Once the server is running locally, you can view API documentation suite using Swagger UI:
 
-auth
-
-post register
-string: username,
-string password,
-
-
-post login
-string username
-string password
-
-user
-
-getAll
-
-add
-getOne,
-delete,
-update
+👉 **[http://localhost:3000/docs/](http://localhost:3000/docs/)**
