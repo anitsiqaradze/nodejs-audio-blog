@@ -15,42 +15,56 @@ module.exports = {
         }
     },
  
-    
-    // getOne: async (req, res) => {
+    // getById: async (req, res) => {
     //     try {
-    //         const item = await UserModel.findById(req.params.id).select('-password');
-    //         if (!item) return res.status(404).json({ message: 'User not found' });
+    //         const userId = req.params.id;
+
+    //         // 1. FAST GUARD RAIL: Instantly validate the parameter format
+    //         // if (!mongoose.Types.ObjectId.isValid(userId)) {
+    //         //     return res.status(400).json({ 
+    //         //         message: `Invalid ID format. Expected a 24-character hex ObjectId, received: "${userId}"` 
+    //         //     });
+    //         // }
+
+    //         // 2. Execute database lookup using .lean() for maximum read performance
+    //         const item = await UserModel.findById(userId);
+    //            // .select('-password')
+    //            // .lean(); // 🚀 High performance optimization: returns a plain JS object, bypassing heavy Mongoose tracking mechanisms
+
+    //         if (!item) {
+    //             return res.status(404).json({ message: 'User not found' });
+    //         }
+
     //         res.json(item);
     //     } catch (error) {
     //         res.status(500).json({ error: error.message });
     //     }
     // },
-    getById: async (req, res) => {
-        try {
-            const userId = req.params.id;
+ getById: async (req, res) => {
+    try {
+        const userId = req.params.id;
 
-            // 1. FAST GUARD RAIL: Instantly validate the parameter format
-            // if (!mongoose.Types.ObjectId.isValid(userId)) {
-            //     return res.status(400).json({ 
-            //         message: `Invalid ID format. Expected a 24-character hex ObjectId, received: "${userId}"` 
-            //     });
-            // }
-
-            // 2. Execute database lookup using .lean() for maximum read performance
-            const item = await UserModel.findById(userId)
-               // .select('-password')
-               // .lean(); // 🚀 High performance optimization: returns a plain JS object, bypassing heavy Mongoose tracking mechanisms
-
-            if (!item) {
-                return res.status(404).json({ message: 'User not found' });
-            }
-
-            res.json(item);
-        } catch (error) {
-            res.status(500).json({ error: error.message });
+        // 1. Re-enable your validation guard rail (Crucial for preventing invalid ID hangs!)
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ 
+                message: `Invalid ID format. Expected a 24-character hex ObjectId, received: "${userId}"` 
+            });
         }
-    },
- 
+
+        // 2. Clean up your query chain and append your ending semicolon
+        const item = await UserModel.findById(userId)
+            .select('-password')
+            .lean(); // 🔥 Clean, fast, closed statement
+
+        if (!item) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json(item);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+},
 
     delete: async (req, res) => {
         try {

@@ -6,28 +6,32 @@ const ApiSecurity = require('../middleware/apiSecurity')
 
 // GET /user/:id/
 router.get('/:id', (req, res, next) => {
-     /* #swagger.tags = ['user'] */
-    UserService.getById;
+     /* swagger.tags = ['user'] 
+        swagger.summary = 'Get user by Id'
+
+     */
+    UserService.getById(req, res, next);
 });
 
 // DELETE /user/:id/
 router.delete('/:id', ApiSecurity.requireLogin, (req, res, next) => {
       /* #swagger.tags = ['user'] */
-     UserService.delete;
+     UserService.delete(req, res, next)
 
 });
 
 // PUT /user/:id/
 router.put('/:id', ApiSecurity.requireLogin, (req, res, next)  => {
      /* #swagger.tags = ['user'] */
-    UserService.update
+    UserService.update(req, res, next);
 });
 
 
 // GET /user/:id/followers
 router.get('/:id/followers',  ApiSecurity.requireLogin, (req, res, next) => {
-    /* #swagger.tags = ['user']
-       #swagger.parameters['id'] = { in: 'path', type: 'string', required: true }
+    /* swagger.tags = ['user']
+       swagger.summary = 'Get user followers'
+       swagger.parameters['id'] = { in: 'path', type: 'string', required: true }
     */
     UserService.getFollowers(req, res, next);
 });
