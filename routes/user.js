@@ -10,18 +10,18 @@ router.get('/:id', (req, res, next) => {
         swagger.summary = 'Get user by Id'
 
      */
-    UserService.getById(req, res, next);
+    UserService.getOne(req, res, next);
 });
 
 // DELETE /user/:id/
-router.delete('/:id', ApiSecurity.requireLogin, (req, res, next) => {
+router.delete('/:id', ApiSecurity.requireLogin, ApiSecurity.isOwner, (req, res, next) => {
       /* #swagger.tags = ['user'] */
-     UserService.delete(req, res, next)
+     UserService.deleteOne(req, res, next)
 
 });
 
 // PUT /user/:id/
-router.put('/:id', ApiSecurity.requireLogin, (req, res, next)  => {
+router.put('/:id', ApiSecurity.requireLogin, ApiSecurity.isOwner, (req, res, next)  => {
      /* #swagger.tags = ['user'] */
     UserService.update(req, res, next);
 });
@@ -44,12 +44,12 @@ router.get('/:id/following', ApiSecurity.requireLogin, (req, res, next) => {
     UserService.getFollowing(req, res, next);
 });
 
-router.post('/:id/follow', ApiSecurity.requireLogin, (req, res, next)=>{
+router.post('/:id/follow', ApiSecurity.requireLogin, ApiSecurity.isOwner, (req, res, next)=>{
      // #swagger.tags = ['user']
     UserService.follow;
 });
 
-router.post('/:id/unfollow', ApiSecurity.requireLogin, (req, res, next)=>{
+router.post('/:id/unfollow', ApiSecurity.requireLogin, ApiSecurity.isOwner, (req, res, next)=>{
      // #swagger.tags = ['user']
     UserService.unfollow;
 });

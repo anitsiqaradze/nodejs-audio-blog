@@ -10,6 +10,7 @@ var indexRouter = require('./routes/index')
 var authRouter = require('./routes/auth');
 var userRouter = require('./routes/user')
 var audioRouter = require('./routes/audio');
+var commentRouter = require('./routes/comments');
 
 var app = express();
 
@@ -32,6 +33,7 @@ app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/audio', audioRouter);
 app.use('/user', userRouter);
+app.use('/comment', commentRouter);
 
 
 // error handler

@@ -13,11 +13,10 @@ router.get('/', (req, res) => {
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Audio Social API</title>
             <style>
                 body {
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-                    background-color: #0f172a;
+                    background-color: #6e5237;
                     color: #f8fafc;
                     display: flex;
                     justify-content: center;
@@ -27,26 +26,26 @@ router.get('/', (req, res) => {
                 }
                 .card {
                     text-align: center;
-                    background: #1e293b;
+                    background: #beba8f83;
                     padding: 3rem;
-                    border-radius: 12px;
+                 
                     box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
                     max-width: 400px;
                 }
                 h1 { color: #f0f8fcbe; margin-top: 0; }
-                p { color: #94a3b8; line-height: 1.6; }
+                p { color: #dde0e6; line-height: 1.6; }
                 .btn {
                     display: inline-block;
                     margin-top: 1.5rem;
                     padding: 0.75rem 1.5rem;
-                    background-color: #38bdf8;
-                    color: #0f172a;
+                    background-color: #b7b9a2af;
+                    color: #c2a985;
                     text-decoration: none;
                     font-weight: bold;
-                    border-radius: 6px;
+                 
                     transition: background 0.2s;
                 }
-                .btn:hover { background-color: #0ea5e9; }
+                .btn:hover { background-color: #213842; }
             </style>
         </head>
         <body>

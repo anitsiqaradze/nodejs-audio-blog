@@ -1,12 +1,37 @@
-var express = require('express');
-var router = express.Router({ mergeParams: true }); // needed to access :postId from the parent router
-
+const express = require('express');
+const router = express.Router({ mergeParams: true });
 const CommentService = require('../services/comment.service');
-const ApiSecurity = require('../middleware/apiSecurity');
+const { requireLogin } = require('../middleware/apiSecurity');
 
-router.get('/', ApiSecurity.requireLogin, CommentService.getAllForPost);
-router.post('/', ApiSecurity.requireLogin, CommentService.add);
-router.put('/:commentId', ApiSecurity.requireLogin, CommentService.update);
-router.delete('/:commentId', ApiSecurity.requireLogin, CommentService.delete);
+// GET /:audioId/
+router.get('/:audioId/', (req, res, next) => {
+    /* #swagger.tags = ['comment'] 
+       #swagger.description = 'Fetch a paginated list of comments for a specific post.' */
+    CommentService.getAllForAudio(req, res, next);
+});
+
+// POST /:audioId/
+router.post('/:audioId/', requireLogin, (req, res, next) => {
+  /* #swagger.tags = ['comment']
+        #swagger.description = 'Add a new comment to a specific post.'
+        
+     
+    */
+    CommentService.add(req, res, next);
+});
+
+// PUT /posts/:postId/comments/:commentId
+router.put('/:commentId', requireLogin, (req, res, next) => {
+    /* #swagger.tags = ['comment'] 
+       #swagger.description = 'Update a comment text string. Restorations restricted to account comment owners.' */
+    CommentService.update(req, res);
+});
+
+// DELETE /posts/:postId/comments/:commentId
+router.delete('/:commentId', requireLogin, (req, res) => {
+    /* #swagger.tags = ['comment'] 
+       #swagger.description = 'Wipe out a comment record. Restorations restricted to account comment owners.' */
+    CommentService.deleteOne(req, res, next);
+});
 
 module.exports = router;

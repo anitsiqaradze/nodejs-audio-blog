@@ -15,58 +15,32 @@ module.exports = {
         }
     },
  
-    // getById: async (req, res) => {
-    //     try {
-    //         const userId = req.params.id;
+  
+    getOne: async (req, res) => {
+        try {
+            const userId = req.params.id;
 
-    //         // 1. FAST GUARD RAIL: Instantly validate the parameter format
-    //         // if (!mongoose.Types.ObjectId.isValid(userId)) {
-    //         //     return res.status(400).json({ 
-    //         //         message: `Invalid ID format. Expected a 24-character hex ObjectId, received: "${userId}"` 
-    //         //     });
-    //         // }
+            if (!mongoose.Types.ObjectId.isValid(userId)) {
+                return res.status(400).json({ 
+                    message: `Invalid ID format. Expected a 24-character hex ObjectId, received: "${userId}"` 
+                });
+            }
 
-    //         // 2. Execute database lookup using .lean() for maximum read performance
-    //         const item = await UserModel.findById(userId);
-    //            // .select('-password')
-    //            // .lean(); // 🚀 High performance optimization: returns a plain JS object, bypassing heavy Mongoose tracking mechanisms
+            const item = await UserModel.findById(userId)
+                .select('-password')
+                .lean(); 
 
-    //         if (!item) {
-    //             return res.status(404).json({ message: 'User not found' });
-    //         }
+            if (!item) {
+                return res.status(404).json({ message: 'User not found' });
+            }
 
-    //         res.json(item);
-    //     } catch (error) {
-    //         res.status(500).json({ error: error.message });
-    //     }
-    // },
- getById: async (req, res) => {
-    try {
-        const userId = req.params.id;
-
-        // 1. Re-enable your validation guard rail (Crucial for preventing invalid ID hangs!)
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({ 
-                message: `Invalid ID format. Expected a 24-character hex ObjectId, received: "${userId}"` 
-            });
+            res.json(item);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
         }
+    },
 
-        // 2. Clean up your query chain and append your ending semicolon
-        const item = await UserModel.findById(userId)
-            .select('-password')
-            .lean(); // 🔥 Clean, fast, closed statement
-
-        if (!item) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        res.json(item);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-},
-
-    delete: async (req, res) => {
+    deleteOne: async (req, res) => {
         try {
             await UserModel.deleteOne({ _id: req.params.id });
             res.json({ success: true });
@@ -108,13 +82,13 @@ module.exports = {
             }
 
         
-            const targetUser = await User.findByIdAndUpdate(targetUserId, 
+            const targetUser = await UserModel.findByIdAndUpdate(targetUserId, 
                 { $addToSet: { followers: actorUserId } }
             );
             
             if (!targetUser) return res.status(404).json({ message: "User not found" });
 
-            await User.findByIdAndUpdate(actorUserId, 
+            await UserModel.findByIdAndUpdate(actorUserId, 
                 { $addToSet: { following: targetUserId } }
             );
 
@@ -129,8 +103,8 @@ module.exports = {
             const targetUserId = req.params.id;
             const actorUserId = req.user._id;
 
-            await User.findByIdAndUpdate(targetUserId, { $pull: { followers: actorUserId } });
-            await User.findByIdAndUpdate(actorUserId, { $pull: { following: targetUserId } });
+            await UserModel.findByIdAndUpdate(targetUserId, { $pull: { followers: actorUserId } });
+            await UserModel.findByIdAndUpdate(actorUserId, { $pull: { following: targetUserId } });
 
             res.json({ message: "Successfully unfollowed user" });
         } catch (error) {
@@ -143,8 +117,7 @@ module.exports = {
         try {
             const targetUserId = req.params.id;
 
-            // Find the user, select only the followers array, and populate it
-            const userProfile = await User.findById(targetUserId)
+            const userProfile = await UserModel.findById(targetUserId)
                 .select('followers') 
                 .populate('followers', 'username avatarUrl bio') 
                 .lean();
@@ -153,7 +126,6 @@ module.exports = {
                 return res.status(404).json({ message: 'User not found' });
             }
 
-            // Return just the populated array to keep the payload clean
             res.json({
                 data: userProfile.followers,
                 count: userProfile.followers.length
@@ -168,8 +140,7 @@ module.exports = {
         try {
             const targetUserId = req.params.id;
 
-            // Find the user, select only the following array, and populate it
-            const userProfile = await User.findById(targetUserId)
+            const userProfile = await UserModel.findById(targetUserId)
                 .select('following')
                 .populate('following', 'username avatarUrl bio')
                 .lean();

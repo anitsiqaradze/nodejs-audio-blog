@@ -19,62 +19,22 @@ module.exports = {
     });
   },
 
-  requireAudioOwnership: async (req, res, next) => {
-        try {
-            const trackId = req.params.fileId;
-            const loggedInUserId = req.user?._id;
-
-            // 1. Fetch the target audio document
-            const track = await Audio.findById(trackId);
-            if (!track) {
-                return res.status(404).json({ message: 'Audio track not found' });
-            }
-
-            // 2. Evaluate access privileges
-            const isOwner = track.uploadedBy.toString() === loggedInUserId.toString();
-            const isAdmin = req.user?.permits?.includes('admin');
-
-            if (!isOwner && !isAdmin) {
-                return res.status(403).json({ 
-                    message: 'invalid_access: You do not have permission to modify this track.' 
-                });
-            }
-
-            // 3. Share the fetched document down the request pipeline!
-            // This saves your controllers from having to run Audio.findById() again.
-            req.track = track;
-            
-            next();
-        } catch (error) {
-            res.status(500).json({ error: error.message });
+      isOwner: (req, res, next) => {
+        if (!req.user || !req.user._id) {
+            return res.status(401).json({ message: 'Unauthorized. Please log in first.' });
         }
-      }
-  // requirePermits: function () {
 
-  //   const permits = [];
-  //   for (let i = 0, l = arguments.length; i < l; i++) {
-  //     if (typeof arguments[i] == 'string') {
-  //       permits.push(arguments[i]);                                                                                                               
-  //     }
-  //   }
+        const loggedInUserId = req.user._id.toString();
+        const targetUserId = req.params.id;
 
-  //   return (req, res, next) => {
-  //     jwt.verify(req.headers.authorization, config.SECRET_KEY, (err, decoded) => {
-  //       if (err) {
-  //         return res.status(401).json({ message: 'invalid_session' })
-  //       }
-  //       req.user = decoded;
+        if (loggedInUserId !== targetUserId) {
+            return res.status(403).json({ 
+                message: 'Forbidden. You do not have permission to modify this profile.' 
+            });
+        }
+        next();
+    }
 
-  //       for (const permit of permits) {
-  //         if ((req.user.permits || []).indexOf(permit) > -1) {
-  //           return next();
-  //         }
-  //       }
-  //       return res.status(403).json({ message: 'invalid_access' })
-  //     });
-
-  //   }
-  // }
 
 
 }

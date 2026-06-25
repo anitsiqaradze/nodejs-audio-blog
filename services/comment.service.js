@@ -1,16 +1,18 @@
 const CommentModel = require('../models/comment.js');
-const PostModel = require('../models/post.js');
+const AudioModel = require('../models/audio.js');
 
 const isOwner = (comment, userId) => comment.commenter.toString() === userId.toString();
 
 module.exports = {
-    // GET /posts/:postId/comments?page=&size=
+
+
+    // GET /audio/:audioId/comments?page=&size=
     getAllForAudio: async (req, res) => {
         try {
-            const { postId } = req.params;
+            const { audioId } = req.params;
             const { page = 1, size = 20 } = req.query;
 
-            const filter = { post: postId };
+            const filter = { audioTrack: audioId };
 
             const comments = await CommentModel.find(filter)
                 .sort({ createdAt: -1 })
@@ -33,26 +35,26 @@ module.exports = {
         }
     },
 
-    // POST /posts/:postId/comments
+    // POST /audio/:audioId/comments
     add: async (req, res) => {
         try {
-            const { postId } = req.params;
+            const { audioId } = req.params;
+            console.log(audioId);
             const { text } = req.body;
 
             if (!text || !text.trim()) {
                 return res.status(400).json({ message: 'Comment text is required' });
             }
 
-            // confirm the post actually exists before allowing a comment on it
-            const post = await PostModel.findOne({ _id: postId, deletedAt: null });
-            if (!post) {
-                return res.status(404).json({ message: 'Post not found' });
+            const audio = await AudioModel.findOne({ _id: audioId, deletedAt: null });
+            if (!audio) {
+                return res.status(404).json({ message: 'Audio not found' });
             }
 
             const comment = await new CommentModel({
                 text,
-                post: postId,
-                commenter: req.user._id, // from token, never trust client-supplied id
+                audioTrack: audioId,
+                commenter: req.user._id, 
             }).save();
 
             res.status(201).json(comment);
@@ -88,7 +90,7 @@ module.exports = {
     },
 
     // DELETE /posts/:postId/comments/:commentId
-    delete: async (req, res) => {
+    deleteOne: async (req, res) => {
         try {
             const { commentId } = req.params;
 

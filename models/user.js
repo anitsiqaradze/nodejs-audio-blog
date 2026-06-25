@@ -34,6 +34,29 @@ const userSchema = new mongoose.Schema({
         j: true,
         wtimeoutMS: 30000
     }
+    
+});
+
+
+userSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
+    try {
+        const userId = this._id;
+
+        const AudioModel = mongoose.model('Audio');
+        const CommentModel = mongoose.model('Comment');
+
+        console.log(`🧼 Cascading delete started for user: ${userId}`);
+
+        await Promise.all([
+            AudioModel.deleteMany({ uploadedBy: userId }), 
+            CommentModel.deleteMany({ user: userId })     
+        ]);
+
+    
+        next();
+    } catch (error) {
+        next(error);
+    }
 });
 
 const UserModel = mongoose.model('User', userSchema);

@@ -8,22 +8,11 @@ const ApiSecurity = require('../middleware/apiSecurity')
 const storage = multer.memoryStorage();
 const upload = multer({ 
     storage: storage,
-    limits: { fileSize: 10 * 1024 * 1024 } // limit files to 10MB
+    limits: { fileSize: 10 * 1024 * 1024 } 
 });
 
 
 
-// #swagger.parameters['title'] = {
-//                 in: 'formData',
-//                 type: 'string',
-//                 required: true,
-//                 description: 'The title of your track'
-//         }
-//        #swagger.parameters['description'] = {
-//                 in: 'formData',
-//                 type: 'string',
-//                 description: 'Optional track details'
-//         }
 router.post('/', ApiSecurity.requireLogin, upload.single('audioTrack'), (req, res, next) => {
    /* #swagger.tags = ['audio']
        #swagger.summary = 'Upload a new audio track'
@@ -64,45 +53,45 @@ router.get('/search', (req, res, next) => {
 });
 
 
-
-router.get('/mytracks', ApiSecurity.requireLogin, (req, res, next)=>{
+// GET /audio/mytracks/
+router.get('/mytracks', ApiSecurity.requireLogin, ApiSecurity.isOwner, (req, res, next)=>{
     /* #swagger.tags = ['audio']*/
     AudioService.getMine(req, res, next);
 })
 
+// GET /audio/:id/
 router.get('/:fileId', (req, res, next) => {
-    /* 
-        #swagger.tags = ['audio']
-        #swagger.parameters['fileId'] = { in: 'path', type: 'string', required: true }
-    */
+    /* #swagger.tags = ['audio']*/
     AudioService.getById(req, res, next);
 });
 
 
-
+// GET /audio/:id/download
 router.get('/:fileId/download', (req, res, next) => {
-    /* #swagger.tags = ['audio']
-       #swagger.parameters['fileId'] = { in: 'path', type: 'string', required: true }
-    */
+    /* #swagger.tags = ['audio']*/
     AudioService.download(req, res, next);
 });
 
-router.put('/:fileId', ApiSecurity.requireLogin, ApiSecurity.requireAudioOwnership, (req, res, next) => {
+
+// PUT /audio/:id/
+router.put('/:fileId', ApiSecurity.requireLogin, ApiSecurity.isOwner, (req, res, next) => {
   /* #swagger.tags = ['audio']
-   
-*/
+     #swagger.summary = 'Update an audio track'
+  */
     AudioService.update(req, res, next);
 });
 
 
-router.delete('/:fileId', ApiSecurity.requireLogin, (req, res, next) => {
+// DELETE /audio/:id/
+router.delete('/:fileId', ApiSecurity.requireLogin, ApiSecurity.isOwner, (req, res, next) => {
     /* #swagger.tags = ['audio']
        #swagger.summary = 'Delete an audio track'
-       #swagger.parameters['fileId'] = { in: 'path', type: 'string', required: true }
     */
     AudioService.delete(req, res, next);
 });
 
+
+// POST /audio/:id/like
 router.post('/:id/like', ApiSecurity.requireLogin, (req, res, next) => {
     /* #swagger.tags = ['audio']
        #swagger.summary = 'Like an audio track'
@@ -111,6 +100,7 @@ router.post('/:id/like', ApiSecurity.requireLogin, (req, res, next) => {
     AudioService.like(req, res, next);
 });
 
+// DELETE /audio/:id/like
 router.delete('/:id/like', ApiSecurity.requireLogin, (req, res, next) => {
     /* #swagger.tags = ['audio']
        #swagger.summary = 'Unlike an audio track'
@@ -119,6 +109,8 @@ router.delete('/:id/like', ApiSecurity.requireLogin, (req, res, next) => {
     AudioService.unlike(req, res, next);
 });
 
+
+// GET /audio/:id/likes/count
 router.get('/:id/likes/count', (req, res, next) => {
     /* #swagger.tags = ['audio']
        #swagger.summary = 'Get like count for an audio track'
